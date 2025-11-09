@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Spring Boot App</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Spring Boot App</h1>
+    <p>This is a simple HTML page with buttons to interact with the backend.</p>
+    
+    <!-- Buttons for demonstration -->
+    <button onclick="alert('Button 1 clicked!')">Button 1</button>
+    <button onclick="alert('Button 2 clicked!')">Button 2</button>
+    <button onclick="fetchData()">Fetch Data from Backend</button>
+	<a href="localhost:8081/Inicio">Ir a la página 2</a>
+
+    
+    <script>
+        // Example JavaScript to connect to Spring Boot REST endpoint
+        function fetchData() {
+            fetch('/api/data')  // Replace with your actual endpoint
+                .then(response => response.json())
+                .then(data => alert('Data from backend: ' + JSON.stringify(data)))
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+	
+	
+	
+</body>
+</html>
