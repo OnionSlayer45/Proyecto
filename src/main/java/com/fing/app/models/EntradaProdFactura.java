@@ -16,12 +16,16 @@ public class EntradaProdFactura {
 	private Long id;
 	
 	@ManyToOne
-	@JoinColumn(name = "producto_id") // Foreign key in Employee table
+	@JoinColumn(name = "producto_id") 
 	public Producto producto;
 	
 	@ManyToOne
-	@JoinColumn(name = "factura_id") // Foreign key in Employee table
+	@JoinColumn(name = "factura_id") 
 	public Factura factura;
+	
+	@ManyToOne
+	@JoinColumn(name = "carrito_id") 
+	public Carrito carrito;
 		
 	@Column
 	public int canti;
@@ -83,6 +87,11 @@ public class EntradaProdFactura {
 	public void setImporte(double importe) {
 		this.importe = importe;
 	}
+	
+	
+	 public double getSubtotal() {
+	        return canti * producto.getPrecio();
+	    }
 	
 	
 	

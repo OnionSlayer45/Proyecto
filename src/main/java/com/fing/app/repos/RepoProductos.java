@@ -6,5 +6,6 @@ import com.fing.app.models.Producto;
 public interface RepoProductos extends CrudRepository<Producto, Long> {
 	
 	Producto findByNombre(String n);
-
+	
+	<S extends Producto> S save(S p);
 }

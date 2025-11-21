@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fing.app.models.Factura;
@@ -19,7 +18,7 @@ public class Rest {
 	RepoProductos repoProductos;
 	
 	
-	@RequestMapping("/inventario")
+	@GetMapping("/inventario")
 	public Factura raiz() {
 		
 		
@@ -38,7 +37,7 @@ public class Rest {
 	
 	
 	
-	@RequestMapping("/lista")
+	@GetMapping("/lista")
 	public List<Producto> lista() {
 		
 		ArrayList<Producto> miList = (ArrayList<Producto>) repoProductos.findAll();
@@ -48,7 +47,7 @@ public class Rest {
 	
 	
 	
-	@RequestMapping("/addProd")
+	@GetMapping("/addProd")
 	public Producto addProd() {
 		
 		Producto prod1 = new Producto("Papas", 20);
@@ -63,18 +62,18 @@ public class Rest {
 	}
 	
 	
-	@RequestMapping("/Inicio")
+	@GetMapping("/Inicio")
 	public Boolean guardar()
 	{
 		return true;
 	}
 	
-	@RequestMapping("/carrito")
+	@GetMapping("/carrito")
 	public List<Producto> carrito() {
 		ArrayList<Producto> miList = (ArrayList<Producto>) repoProductos.findAll();
 		return miList;
 	}
-	@RequestMapping("/producto")
+	@GetMapping("/producto")
 	public Producto infoProducto(Producto prueba) {
 		Producto pruebas = new Producto("Pizza",20,"Pizza casera rica");
 		repoProductos.save(pruebas);
