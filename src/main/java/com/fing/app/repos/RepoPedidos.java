@@ -9,5 +9,5 @@ public interface RepoPedidos extends CrudRepository<Producto, Long> {
 	
 	Pedidos findByNombre(String n);
 	
-	<S extends Pedidos> S save(S p);
+	
 }

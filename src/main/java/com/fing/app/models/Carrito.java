@@ -28,6 +28,10 @@ public class Carrito {
 	private double total;
 	
 	
+	public Carrito() {
+		cantidad =0;
+	}
+	
 	
 	
 	public Long getId() {
