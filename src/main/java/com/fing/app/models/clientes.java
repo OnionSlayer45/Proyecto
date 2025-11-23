@@ -1,4 +1,11 @@
 package com.fing.app.models;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.*;
 
 
@@ -29,9 +36,21 @@ public class clientes {
 	 
 	 @Column
 	 private String userName;
+	 
+	 @Column 
+	 private int jaja;
+	 
+	 
+	 private String authorities;
 	
+	 public clientes() {}
 	
-	public clientes() {}
+	public clientes(String user, String pass, int a) {
+		
+		userName=user;
+		password=pass;
+		jaja=9;
+	}
 	
 	
 	public clientes(String nom, String ape, String dir) {
@@ -103,7 +122,7 @@ public class clientes {
 	}
 
 
-	public String getUserName() {
+	public String getUsername() {
 		return userName;
 	}
 
@@ -111,9 +130,11 @@ public class clientes {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	
-	
 }
+
+
+	
+
 	
 
 

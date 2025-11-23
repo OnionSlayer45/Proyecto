@@ -17,35 +17,44 @@
             <i class='bx bx-store-alt'></i> Tienda
         </div>
         
-        <button class="btn-carrito">
-            <i class='bx bx-cart'></i> Carrito
-            <span class="badge" id="contador-carrito">0</span>
-        </button>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <button class="btn-carrito" onclick="toggleCarrito()">
+                <i class='bx bx-cart'></i> Carrito
+                <span class="badge" id="contador-carrito">0</span>
+            </button>
+            <form action="/logout" method="post" style="margin: 0;">
+                <button type="submit" class="btn-carrito" style="background: #EF4444;">
+                    <i class='bx bx-log-out'></i> Salir
+                </button>
+            </form>
+        </div>
     </header>
 
     <main>
-        <h1>Productos</h1>
+        <section id="vista-catalogo">
+            <h1>Productos</h1>
 
-        <div class="grid" id="contenedor-productos">
-            <div style="text-align:center; grid-column: 1/-1; color:gray;">
-                Cargando productos
+            <div class="grid-productos" id="contenedor-productos">
+                <div style="text-align:center; grid-column: 1/-1; color:gray;">
+                    Cargando productos...
+                </div>
             </div>
-        </div>
+            
+            <div id="aviso-vacio" style="display:none; text-align:center; margin-top:2rem;">
+                <p>No hay productos disponibles.</p>
+                <button onclick="generarDatos()" style="padding:10px 20px; cursor:pointer; background: #7C3AED; color: white; border: none; border-radius: 8px;">
+                    Generar Datos de Prueba
+                </button>
+            </div>
+        </section>
         
-        <div id="aviso-vacio" style="display:none; text-align:center; margin-top:2rem;">
-            <p>No hay productos.</p>
-            <button onclick="generarDatos()" style="padding:10px 20px; cursor:pointer;">
-                Generar Datos
-            </button>
-        </div>
-        
-        // parte del carrito
         <section id="vista-carrito" style="display: none;">
             <h1>Mi Carrito</h1>
             
             <div class="carrito-layout">
                 <div class="lista-items" id="lista-carrito-items">
-                    </div>
+                    <p style="text-align: center; color: #9CA3AF;">Tu carrito está vacío</p>
+                </div>
 
                 <div class="resumen-card">
                     <div class="row-resumen">
@@ -63,23 +72,27 @@
                         <span id="cart-total" class="total-highlight">$0.00</span>
                     </div>
 
-                    <button class="btn-pagar" onclick="alert('Conexión con Factura.java pendiente')">Proceder al pago</button>
+                    <button class="btn-pagar" onclick="procesarCompra()">
+                        <i class='bx bx-credit-card'></i> Proceder al Pago
+                    </button>
+                    
+                    <button onclick="toggleCarrito()" style="width: 100%; margin-top: 1rem; padding: 0.8rem; background: #E5E7EB; color: #374151; border: none; border-radius: 10px; cursor: pointer; font-weight: 500;">
+                        Seguir Comprando
+                    </button>
                 </div>
             </div>
         </section>
-        
     </main>
 
     <script>
-        // --- VARIABLES DE ESTADO ---
         let inventarioGlobal = []; 
-        let carrito = [];          
+        let carrito = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarProductosDesdeJava();
+            cargarCarritoDelServidor();
         });
 
-        //Traer productos del Back
         async function cargarProductosDesdeJava() {
             try {
                 const response = await fetch('/lista'); 
@@ -93,7 +106,26 @@
             }
         }
 
-        //catálogo
+        async function cargarCarritoDelServidor() {
+            try {
+                const response = await fetch('/api/carrito/obtener');
+                const resultado = await response.json();
+                
+                if (resultado.success && resultado.items) {
+                    carrito = resultado.items.map(item => ({
+                        id: item.producto.id,
+                        nombre: item.producto.nombre,
+                        precio: item.producto.precio,
+                        cantidad: item.canti,
+                        descri: item.producto.descri
+                    }));
+                    actualizarContadorHeader();
+                }
+            } catch (error) {
+                console.error("Error al cargar carrito:", error);
+            }
+        }
+
         function dibujarCatalogo(productos) {
             const contenedor = document.getElementById('contenedor-productos');
             const avisoVacio = document.getElementById('aviso-vacio');
@@ -115,7 +147,7 @@
                             <p>${descripcion}</p>
                         </div>
                         <div class="card-footer">
-                            <span class="precio">$${prod.precio}</span>
+                            <span class="precio">$${prod.precio.toFixed(2)}</span>
                             <button class="btn-add" onclick="agregarAlCarrito(${prod.id})">
                                 <i class='bx bx-plus'></i>
                             </button>
@@ -126,27 +158,58 @@
             });
         }
 
-        // AGREGAR al carrito
-        function agregarAlCarrito(idProducto) {
-            const productoEncontrado = inventarioGlobal.find(p => p.id === idProducto);
-            if (!productoEncontrado) return;
+        async function agregarAlCarrito(idProducto) {
+            try {
+                const response = await fetch('/api/carrito/agregar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productoId: idProducto })
+                });
 
-            const itemEnCarrito = carrito.find(item => item.id === idProducto);
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    const productoEncontrado = inventarioGlobal.find(p => p.id === idProducto);
+                    const itemEnCarrito = carrito.find(item => item.id === idProducto);
 
-            if (itemEnCarrito) {
-                itemEnCarrito.cantidad++;
-            } else {
-                carrito.push({ ...productoEncontrado, cantidad: 1 });
+                    if (itemEnCarrito) {
+                        itemEnCarrito.cantidad++;
+                    } else {
+                        carrito.push({ ...productoEncontrado, cantidad: 1 });
+                    }
+
+                    actualizarContadorHeader();
+                    
+                    // Animación de éxito
+                    const btn = event.target.closest('.btn-add');
+                    btn.style.transform = 'scale(1.3)';
+                    btn.style.background = '#10B981';
+                    setTimeout(() => {
+                        btn.style.transform = '';
+                        btn.style.background = '';
+                    }, 300);
+                } else {
+                    alert('Error al agregar producto: ' + resultado.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert('Error al agregar el producto al carrito');
             }
-
-            actualizarContadorHeader();
-            renderizarVistaCarrito(); 
         }
 
-        // lista del Carrito 
         function renderizarVistaCarrito() {
             const contenedorItems = document.getElementById('lista-carrito-items');
             contenedorItems.innerHTML = ''; 
+
+            if (carrito.length === 0) {
+                contenedorItems.innerHTML = '<p style="text-align: center; color: #9CA3AF;">Tu carrito está vacío</p>';
+                document.getElementById('cart-subtotal').innerText = "$0.00";
+                document.getElementById('cart-iva').innerText = "$0.00";
+                document.getElementById('cart-total').innerText = "$0.00";
+                return;
+            }
 
             let subtotalAcumulado = 0;
 
@@ -160,15 +223,15 @@
                             <div class="thumb"></div> 
                             <div>
                                 <h4>${item.nombre}</h4>
-                                <span class="precio" style="font-size:1rem">$${item.precio} c/u</span>
+                                <span class="precio" style="font-size:1rem">$${item.precio.toFixed(2)} c/u</span>
                             </div>
                         </div>
                         <div class="qty-selector">
-                            <button class="qty-btn" onclick="cambiarCantidad(${index}, -1)">-</button>
+                            <button class="qty-btn" onclick="cambiarCantidad(${item.id}, -1)">-</button>
                             <span>${item.cantidad}</span>
-                            <button class="qty-btn" onclick="cambiarCantidad(${index}, 1)">+</button>
+                            <button class="qty-btn" onclick="cambiarCantidad(${item.id}, 1)">+</button>
                         </div>
-                        <button class="btn-delete" onclick="eliminarDelCarrito(${index})">
+                        <button class="btn-delete" onclick="eliminarDelCarrito(${item.id})">
                             <i class='bx bx-trash'></i>
                         </button>
                     </div>
@@ -184,20 +247,57 @@
             document.getElementById('cart-total').innerText = "$" + total.toFixed(2);
         }
 
-        function cambiarCantidad(index, delta) {
-            carrito[index].cantidad += delta;
-            if (carrito[index].cantidad <= 0) {
-                eliminarDelCarrito(index);
-            } else {
-                renderizarVistaCarrito();
-                actualizarContadorHeader();
+        async function cambiarCantidad(productoId, delta) {
+            const item = carrito.find(i => i.id === productoId);
+            if (!item) return;
+
+            const nuevaCantidad = item.cantidad + delta;
+
+            if (nuevaCantidad <= 0) {
+                eliminarDelCarrito(productoId);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/carrito/actualizar', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        productoId: productoId,
+                        cantidad: nuevaCantidad
+                    })
+                });
+
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    item.cantidad = nuevaCantidad;
+                    renderizarVistaCarrito();
+                    actualizarContadorHeader();
+                }
+            } catch (error) {
+                console.error("Error:", error);
             }
         }
 
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            renderizarVistaCarrito();
-            actualizarContadorHeader();
+        async function eliminarDelCarrito(productoId) {
+            try {
+                const response = await fetch(`/api/carrito/eliminar/${productoId}`, {
+                    method: 'DELETE'
+                });
+
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    carrito = carrito.filter(item => item.id !== productoId);
+                    renderizarVistaCarrito();
+                    actualizarContadorHeader();
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
         }
 
         function actualizarContadorHeader() {
@@ -215,14 +315,45 @@
             if (catalogo.style.display !== 'none') {
                 catalogo.style.display = 'none';
                 carritoView.style.display = 'block';
+                renderizarVistaCarrito();
             } else {
-                mostrarTienda();
+                catalogo.style.display = 'block';
+                carritoView.style.display = 'none';
             }
         }
 
-        function mostrarTienda() {
-            document.getElementById('vista-catalogo').style.display = 'block';
-            document.getElementById('vista-carrito').style.display = 'none';
+        async function procesarCompra() {
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+
+            if (!confirm('¿Deseas proceder con la compra?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/factura/procesar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    alert(`¡Compra exitosa!\n\nFolio: ${resultado.folio}\nTotal: $${resultado.total.toFixed(2)}\n\n¡Gracias por tu compra!`);
+                    carrito = [];
+                    actualizarContadorHeader();
+                    toggleCarrito();
+                } else {
+                    alert('Error al procesar la compra: ' + resultado.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert('Error al procesar la compra');
+            }
         }
 
         async function generarDatos() {

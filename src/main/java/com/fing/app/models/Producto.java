@@ -1,9 +1,12 @@
 package com.fing.app.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Producto {
@@ -20,6 +23,10 @@ public class Producto {
 	
 	@Column
 	private String descri = "";
+	
+	 @ManyToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "proveedor_id")
+	    private Proveedores proveedor;
 	
 	
 	public Producto() {}

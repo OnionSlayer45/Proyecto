@@ -1,7 +1,11 @@
 package com.fing.app.controllers;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fing.app.models.Carrito;
 import com.fing.app.models.Factura;
 import com.fing.app.models.Producto;
+import com.fing.app.models.clientes;
+import com.fing.app.repos.RepoCarrito;
 import com.fing.app.repos.RepoClientes;
 import com.fing.app.repos.RepoFacturas;
-import com.fing.app.repos.RepoMetodosDePago;
+
 import com.fing.app.repos.RepoPedidos;
 import com.fing.app.repos.RepoProductos;
 
 @RestController
 public class Rest {
-	
+	@Autowired 
+	RepoCarrito repoCarritos;
 	@Autowired
 	RepoProductos repoProductos;
 	
@@ -28,15 +35,21 @@ public class Rest {
 	@Autowired
 	RepoFacturas repoFacturas;
 	
-	@Autowired
-	RepoMetodosDePago repoMetodosDePago;
+	
 	
 	@Autowired
 	RepoPedidos repoPedidos;
-	
-	
-	
-	
+		
+	@GetMapping("/public/Nuevo")
+	public clientes Nuevos(){
+	clientes cliente = new clientes("Pepe","Paco",1);
+		
+		repoClientes.save(cliente);
+		
+		return cliente;
+	}
+		
+		
 	
 	@GetMapping("/inventario")
 	public Factura raiz() {
@@ -48,8 +61,7 @@ public class Rest {
 		
 		Factura f01 = new Factura();
 		
-		f01.addProd(2, prod1);
-		f01.addProd(2, prod2);
+	
 		
 		
 		return f01;
@@ -114,6 +126,13 @@ public class Rest {
 		 Carrito carrito = new Carrito();
 		 return carrito;
 	 }
+	 
+
+	 
+	 
+	 
+	 
+	 
 }
 
 

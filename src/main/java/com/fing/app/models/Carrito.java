@@ -8,63 +8,46 @@ import jakarta.persistence.*;
 @Entity
 public class Carrito {
 
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-	
-	@OneToOne
+    
+    @OneToOne
     @JoinColumn(name = "cliente_id")
     private clientes cliente;
-	
-	@Column
-	private int cantidad;
-	
-	@OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
-	public List<EntradaProdFactura> listaProductos = new ArrayList<>();
-	
-	
-	@Column 
-	private double total;
-	
-	
-	public Carrito() {
-		cantidad =0;
-	}
-	
-	
-	
-	public Long getId() {
-		return id;
-	}
+    
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<EntradaProdFactura> listaProductos = new ArrayList<>();
+    
+    public Carrito() {}
+    
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public clientes getCliente() {
+        return cliente;
+    }
 
+    public void setCliente(clientes cliente) {
+        this.cliente = cliente;
+    }
 
-	
-
-
-	public Double getTotal() {
+    public Double getTotal() {
         return listaProductos.stream()
                 .mapToDouble(EntradaProdFactura::getSubtotal)
                 .sum();
     }
 
+    public List<EntradaProdFactura> getListaProductos() {
+        return listaProductos;
+    }
 
-	
-
-
-	public List<EntradaProdFactura> getListaProductos() {
-		return listaProductos;
-	}
-
-
-	public void setListaProductos(ArrayList<EntradaProdFactura> listaProductos) {
-		this.listaProductos = listaProductos;
-	}
-	
-	
+    public void setListaProductos(List<EntradaProdFactura> listaProductos) {
+        this.listaProductos = listaProductos;
+    }
 }

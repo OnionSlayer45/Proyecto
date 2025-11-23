@@ -5,9 +5,9 @@ import org.springframework.data.repository.CrudRepository;
 import com.fing.app.models.Pedidos;
 import com.fing.app.models.Producto;
 
-public interface RepoPedidos extends CrudRepository<Producto, Long> {
+public interface RepoPedidos extends CrudRepository<Pedidos, Long> {
 	
-	Pedidos findByNombre(String n);
+	
 	
 	
 }
