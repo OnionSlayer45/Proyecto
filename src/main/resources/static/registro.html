@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - Mi Tienda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section h1 {
+            color: #7C3AED;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-section p {
+            color: #9CA3AF;
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6B7280;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #7C3AED;
+            border-bottom-color: #7C3AED;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #7C3AED;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: #7C3AED;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            background: #5B21B6;
+        }
+
+        .btn-submit:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo-section">
+            <h1>🛍️ Mi Tienda</h1>
+            <p>Bienvenido</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="cambiarTab('login')">Iniciar Sesión</button>
+            <button class="tab" onclick="cambiarTab('registro')">Registrarse</button>
+        </div>
+
+        <div id="mensaje" class="alert"></div>
+
+        <!-- FORMULARIO DE LOGIN -->
+        <div id="form-login" class="form-container active">
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label for="username-login">Usuario</label>
+                    <input type="text" id="username-login" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password-login">Contraseña</label>
+                    <input type="password" id="password-login" name="password" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Iniciar Sesión</button>
+            </form>
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <div id="form-registro" class="form-container">
+            <form id="formRegistro">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" id="apellido" name="apellido" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmar">Confirmar Contraseña</label>
+                    <input type="password" id="confirmar" name="confirmar" required minlength="6">
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnRegistro">Registrarse</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function cambiarTab(tab) {
+            // Actualizar tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Mostrar formulario correspondiente
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            document.getElementById(`form-${tab}`).classList.add('active');
+
+            // Limpiar mensajes
+            document.getElementById('mensaje').classList.remove('show');
+        }
+
+        // Manejo del formulario de registro
+        const formRegistro = document.getElementById('formRegistro');
+        const mensaje = document.getElementById('mensaje');
+        const btnRegistro = document.getElementById('btnRegistro');
+
+        if (formRegistro) {
+            formRegistro.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const password = document.getElementById('password').value;
+                const confirmar = document.getElementById('confirmar').value;
+
+                if (password !== confirmar) {
+                    mostrarMensaje('Las contraseñas no coinciden', 'error');
+                    return;
+                }
+
+                btnRegistro.disabled = true;
+                btnRegistro.textContent = 'Registrando...';
+
+                const datos = {
+                    cliente_nombre: document.getElementById('nombre').value,
+                    cliente_apellido: document.getElementById('apellido').value,
+                    direccion: document.getElementById('direccion').value,
+                    userName: document.getElementById('username').value,
+                    password: password
+                };
+
+                try {
+                    const response = await fetch('/api/registro', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(datos)
+                    });
+
+                    const resultado = await response.json();
+
+                    if (resultado.success) {
+                        mostrarMensaje('¡Registro exitoso! Ahora puedes iniciar sesión', 'success');
+                        setTimeout(() => {
+                            cambiarTab('login');
+                            formRegistro.reset();
+                        }, 2000);
+                    } else {
+                        mostrarMensaje(resultado.message, 'error');
+                    }
+                } catch (error) {
+                    mostrarMensaje('Error al conectar con el servidor', 'error');
+                } finally {
+                    btnRegistro.disabled = false;
+                    btnRegistro.textContent = 'Registrarse';
+                }
+            });
+        }
+
+        function mostrarMensaje(texto, tipo) {
+            mensaje.textContent = texto;
+            mensaje.className = `alert alert-${tipo} show`;
+            setTimeout(() => {
+                mensaje.classList.remove('show');
+            }, 5000);
+        }
+
+        // Mostrar mensaje si viene de logout
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('logout')) {
+            mostrarMensaje('Sesión cerrada exitosamente', 'success');
+        }
+    </script>
+</body>
+</html>
