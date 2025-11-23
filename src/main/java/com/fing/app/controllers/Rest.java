@@ -87,6 +87,8 @@ public class Rest {
 		ArrayList<Producto> miList = (ArrayList<Producto>) repoProductos.findAll();
 		return miList;
 	}
+	
+	
 	@GetMapping("/producto")
 	public Producto infoProducto(Producto prueba) {
 		Producto pruebas = new Producto("Pizza",20,"Pizza casera rica");
@@ -94,13 +96,8 @@ public class Rest {
 		return pruebas ;
 	}
 	
-	 @GetMapping("/api/data")
-	    public String getData() {
-	        return "{\"message\": \"Hello from Spring Boot!\"}";
-	    }
 	 
-	 
-	 @GetMapping("Productos")
+	 @GetMapping("/Productos")
 	 public Producto nuevo() {
 		 Producto pro = new Producto("RX 7600",5200);
 		 repoProductos.save(pro);

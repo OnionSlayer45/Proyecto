@@ -21,6 +21,14 @@ public class clientes {
 	
 	 @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
 	    private Carrito carrito;
+	 
+	 
+	 @Column
+	 private String password;
+	 
+	 
+	 @Column
+	 private String userName;
 	
 	
 	public clientes() {}
@@ -33,32 +41,79 @@ public class clientes {
 		direccion=dir;
 		
 	}
-	
 
-	public Long getId() {
+
+	public Long getCliente_id() {
 		return cliente_id;
 	}
 
-	public void setId(Long id) {
-		this.cliente_id = id;
+
+	public void setCliente_id(Long cliente_id) {
+		this.cliente_id = cliente_id;
 	}
 
-	public String getNombre() {
+
+	public String getCliente_nombre() {
 		return cliente_nombre;
 	}
 
-	public void setNombre(String nombre) {
-		this.cliente_nombre = nombre;
+
+	public void setCliente_nombre(String cliente_nombre) {
+		this.cliente_nombre = cliente_nombre;
 	}
+
+
+	public String getCliente_apellido() {
+		return cliente_apellido;
+	}
+
+
+	public void setCliente_apellido(String cliente_apellido) {
+		this.cliente_apellido = cliente_apellido;
+	}
+
 
 	public String getDireccion() {
 		return direccion;
 	}
 
-	public void setPrecio(String dire) {
-		this.direccion= dire;
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
 	}
 
+
+	public Carrito getCarrito() {
+		return carrito;
+	}
+
+
+	public void setCarrito(Carrito carrito) {
+		this.carrito = carrito;
+	}
+
+
+	public String getPassword() {
+		return password;
+	}
+
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	public String getUserName() {
+		return userName;
+	}
+
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 	
 	
 }
+	
+
+
