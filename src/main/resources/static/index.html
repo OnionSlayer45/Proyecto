@@ -9,6 +9,171 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     
     <link rel="stylesheet" href="estilos.css">
+    <style>
+        .pedido-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #F3F4F6;
+            transition: transform 0.2s;
+        }
+        
+        .pedido-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .pedido-folio {
+            font-weight: 600;
+            color: #374151;
+            font-size: 1.1rem;
+        }
+        
+        .pedido-estado {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .estado-pendiente {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .estado-en_proceso {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        
+        .estado-enviado {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+        
+        .estado-entregado {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .estado-cancelado {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .pedido-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #6B7280;
+        }
+        
+        .pedido-total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #7C3AED;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+        
+        .pedido-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-ver-detalle {
+            flex: 1;
+            padding: 0.6rem;
+            background: #F3F4F6;
+            color: #374151;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .btn-ver-detalle:hover {
+            background: #E5E7EB;
+        }
+        
+        .btn-cancelar {
+            padding: 0.6rem 1rem;
+            background: #FEE2E2;
+            color: #991B1B;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .btn-cancelar:hover {
+            background: #FECACA;
+        }
+        
+        .detalle-producto-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+        }
+    </style>
 </head>
 <body>
 
@@ -18,9 +183,15 @@
         </div>
         
         <div style="display: flex; gap: 1rem; align-items: center;">
+            <button class="btn-carrito" onclick="mostrarVista('catalogo')">
+                <i class='bx bx-store'></i> Productos
+            </button>
             <button class="btn-carrito" onclick="toggleCarrito()">
                 <i class='bx bx-cart'></i> Carrito
                 <span class="badge" id="contador-carrito">0</span>
+            </button>
+            <button class="btn-carrito" onclick="mostrarVista('pedidos')" style="background: #F59E0B;">
+                <i class='bx bx-package'></i> Mis Pedidos
             </button>
             <form action="/logout" method="post" style="margin: 0;">
                 <button type="submit" class="btn-carrito" style="background: #EF4444;">
@@ -31,9 +202,9 @@
     </header>
 
     <main>
+        <!-- Vista Catálogo -->
         <section id="vista-catalogo">
             <h1>Productos</h1>
-
             <div class="grid-productos" id="contenedor-productos">
                 <div style="text-align:center; grid-column: 1/-1; color:gray;">
                     Cargando productos...
@@ -48,6 +219,7 @@
             </div>
         </section>
         
+        <!-- Vista Carrito -->
         <section id="vista-carrito" style="display: none;">
             <h1>Mi Carrito</h1>
             
@@ -76,17 +248,38 @@
                         <i class='bx bx-credit-card'></i> Proceder al Pago
                     </button>
                     
-                    <button onclick="toggleCarrito()" style="width: 100%; margin-top: 1rem; padding: 0.8rem; background: #E5E7EB; color: #374151; border: none; border-radius: 10px; cursor: pointer; font-weight: 500;">
+                    <button onclick="mostrarVista('catalogo')" style="width: 100%; margin-top: 1rem; padding: 0.8rem; background: #E5E7EB; color: #374151; border: none; border-radius: 10px; cursor: pointer; font-weight: 500;">
                         Seguir Comprando
                     </button>
                 </div>
             </div>
         </section>
+
+        <!-- Vista Pedidos -->
+        <section id="vista-pedidos" style="display: none;">
+            <h1>Historial de Pedidos</h1>
+            
+            <div id="lista-pedidos">
+                <p style="text-align: center; color: #9CA3AF;">Cargando pedidos...</p>
+            </div>
+        </section>
     </main>
+
+    <!-- Modal Detalle Pedido -->
+    <div id="modal-detalle" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalle del Pedido</h2>
+                <button class="btn-close-modal" onclick="cerrarModal()">×</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
 
     <script>
         let inventarioGlobal = []; 
         let carrito = [];
+        let pedidosGlobales = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarProductosDesdeJava();
@@ -182,7 +375,6 @@
 
                     actualizarContadorHeader();
                     
-                    // Animación de éxito
                     const btn = event.target.closest('.btn-add');
                     btn.style.transform = 'scale(1.3)';
                     btn.style.background = '#10B981';
@@ -309,17 +501,8 @@
         }
 
         function toggleCarrito() {
-            const catalogo = document.getElementById('vista-catalogo');
-            const carritoView = document.getElementById('vista-carrito');
-            
-            if (catalogo.style.display !== 'none') {
-                catalogo.style.display = 'none';
-                carritoView.style.display = 'block';
-                renderizarVistaCarrito();
-            } else {
-                catalogo.style.display = 'block';
-                carritoView.style.display = 'none';
-            }
+            mostrarVista('carrito');
+            renderizarVistaCarrito();
         }
 
         async function procesarCompra() {
@@ -333,11 +516,12 @@
             }
 
             try {
-                const response = await fetch('/api/factura/procesar', {
+                const response = await fetch('/api/pedidos/crear', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({})
                 });
 
                 const resultado = await response.json();
@@ -346,7 +530,7 @@
                     alert(`¡Compra exitosa!\n\nFolio: ${resultado.folio}\nTotal: $${resultado.total.toFixed(2)}\n\n¡Gracias por tu compra!`);
                     carrito = [];
                     actualizarContadorHeader();
-                    toggleCarrito();
+                    mostrarVista('pedidos');
                 } else {
                     alert('Error al procesar la compra: ' + resultado.message);
                 }
@@ -356,10 +540,183 @@
             }
         }
 
+        async function cargarPedidos() {
+            try {
+                const response = await fetch('/api/pedidos/historial');
+                const resultado = await response.json();
+                
+                const contenedor = document.getElementById('lista-pedidos');
+                
+                if (resultado.success && resultado.pedidos.length > 0) {
+                    pedidosGlobales = resultado.pedidos;
+                    contenedor.innerHTML = '';
+                    
+                    resultado.pedidos.forEach(pedido => {
+                        const fecha = new Date(pedido.fecha);
+                        const fechaFormato = fecha.toLocaleDateString('es-MX', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        const estadoClass = `estado-${pedido.estado.toLowerCase()}`;
+                        const puedeCancelar = pedido.estado === 'PENDIENTE';
+                        
+                        const htmlPedido = `
+                            <div class="pedido-card">
+                                <div class="pedido-header">
+                                    <span class="pedido-folio">${pedido.folio}</span>
+                                    <span class="pedido-estado ${estadoClass}">${pedido.estado}</span>
+                                </div>
+                                <div class="pedido-info">
+                                    <div><i class='bx bx-calendar'></i> ${fechaFormato}</div>
+                                    <div><i class='bx bx-package'></i> ${pedido.cantidadProductos} producto(s)</div>
+                                </div>
+                                <div class="pedido-total">Total: $${pedido.total.toFixed(2)}</div>
+                                <div class="pedido-actions">
+                                    <button class="btn-ver-detalle" onclick="verDetallePedido(${pedido.id})">
+                                        <i class='bx bx-detail'></i> Ver Detalle
+                                    </button>
+                                    ${puedeCancelar ? `<button class="btn-cancelar" onclick="cancelarPedido(${pedido.id})">
+                                        <i class='bx bx-x'></i> Cancelar
+                                    </button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                        contenedor.innerHTML += htmlPedido;
+                    });
+                } else {
+                    contenedor.innerHTML = '<p style="text-align: center; color: #9CA3AF;">No tienes pedidos aún</p>';
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('lista-pedidos').innerHTML = '<p>Error al cargar pedidos</p>';
+            }
+        }
+
+        async function verDetallePedido(pedidoId) {
+            try {
+                const response = await fetch(`/api/pedidos/detalle/${pedidoId}`);
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    const pedido = resultado.pedido;
+                    const fecha = new Date(pedido.fecha).toLocaleDateString('es-MX', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    let htmlProductos = '';
+                    pedido.productos.forEach(prod => {
+                        htmlProductos += `
+                            <div class="detalle-producto-item">
+                                <div>
+                                    <strong>${prod.nombre}</strong>
+                                    <div style="color: #6B7280; font-size: 0.85rem;">
+                                        ${prod.cantidad} x $${prod.precioUnitario.toFixed(2)}
+                                    </div>
+                                </div>
+                                <strong>$${prod.importe.toFixed(2)}</strong>
+                            </div>
+                        `;
+                    });
+                    
+                    const modalBody = document.getElementById('modal-body');
+                    modalBody.innerHTML = `
+                        <div style="margin-bottom: 1.5rem;">
+                            <p><strong>Folio:</strong> ${pedido.folio}</p>
+                            <p><strong>Fecha:</strong> ${fecha}</p>
+                            <p><strong>Estado:</strong> <span class="pedido-estado estado-${pedido.estado.toLowerCase()}">${pedido.estado}</span></p>
+                            <p><strong>Dirección:</strong> ${pedido.direccion}</p>
+                            ${pedido.notas ? `<p><strong>Notas:</strong> ${pedido.notas}</p>` : ''}
+                        </div>
+                        
+                        <h3 style="margin-bottom: 1rem;">Productos</h3>
+                        ${htmlProductos}
+                        
+                        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid #E5E7EB;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Subtotal:</span>
+                                <span>$${pedido.subtotal.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>IVA (16%):</span>
+                                <span>$${pedido.iva.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: 700; color: #7C3AED;">
+                                <span>Total:</span>
+                                <span>$${pedido.total.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('modal-detalle').classList.add('show');
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert('Error al cargar el detalle del pedido');
+            }
+        }
+
+        async function cancelarPedido(pedidoId) {
+            if (!confirm('¿Estás seguro de que deseas cancelar este pedido?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/pedidos/cancelar/${pedidoId}`, {
+                    method: 'PUT'
+                });
+                
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    alert('Pedido cancelado exitosamente');
+                    cargarPedidos();
+                } else {
+                    alert(resultado.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert('Error al cancelar el pedido');
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-detalle').classList.remove('show');
+        }
+
+        function mostrarVista(vista) {
+            document.getElementById('vista-catalogo').style.display = 'none';
+            document.getElementById('vista-carrito').style.display = 'none';
+            document.getElementById('vista-pedidos').style.display = 'none';
+            
+            if (vista === 'catalogo') {
+                document.getElementById('vista-catalogo').style.display = 'block';
+            } else if (vista === 'carrito') {
+                document.getElementById('vista-carrito').style.display = 'block';
+            } else if (vista === 'pedidos') {
+                document.getElementById('vista-pedidos').style.display = 'block';
+                cargarPedidos();
+            }
+        }
+
         async function generarDatos() {
             await fetch('/addProd');
             location.reload();
         }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal-detalle').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
     </script>
 </body>
 </html>
