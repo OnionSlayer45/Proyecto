@@ -1,4 +1,4 @@
-Para que funcione es necesario tener instalado un docker
+Para que funcione es necesario tener instalado un programa de docker
 despues se proccede a la termial de Linux o a powershell en caso de Windows
 Y procedemos a la carpeda del proyecto con cd y la direccion
 en este vamos a usar el comando 
