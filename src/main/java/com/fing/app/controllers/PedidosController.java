@@ -120,12 +120,152 @@ public class PedidosController {
 
     @GetMapping("/historial")
     public Map<String, Object> obtenerHistorial(Authentication auth) {
-        // ... (Tu código original de historial) ...
-        // Para simplificar, dejo este método resumido, pero tú usa tu código original
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            String username = auth.getName();
+            clientes cliente = repoClientes.findByUserName(username);
+            
+            if (cliente == null) {
+                response.put("success", false);
+                response.put("message", "Cliente no encontrado");
+                return response;
+            }
+
+            List<Pedidos> pedidos = repoPedidos.findByClienteOrderByFechaPedidoDesc(cliente);
+            
+            // Convertir a formato más amigable para el frontend
+            List<Map<String, Object>> pedidosDTO = pedidos.stream().map(p -> {
+                Map<String, Object> pedidoMap = new HashMap<>();
+                pedidoMap.put("id", p.getPedidoId());
+                pedidoMap.put("folio", p.getFolio());
+                pedidoMap.put("fecha", p.getFechaPedido().toString());
+                pedidoMap.put("estado", p.getEstado());
+                pedidoMap.put("total", p.getTotal());
+                pedidoMap.put("subtotal", p.getSubtotal());
+                pedidoMap.put("iva", p.getIva());
+                pedidoMap.put("direccion", p.getDireccionEntrega());
+                pedidoMap.put("cantidadProductos", p.getDetalles().size());
+                return pedidoMap;
+            }).collect(Collectors.toList());
+
+            response.put("success", true);
+            response.put("pedidos", pedidosDTO);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @GetMapping("/detalle/{pedidoId}")
+    public Map<String, Object> obtenerDetallePedido(@PathVariable Long pedidoId, Authentication auth) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            String username = auth.getName();
+            clientes cliente = repoClientes.findByUserName(username);
+            
+            Pedidos pedido = repoPedidos.findById(pedidoId).orElse(null);
+            
+            if (pedido == null) {
+                response.put("success", false);
+                response.put("message", "Pedido no encontrado");
+                return response;
+            }
+
+            // Verificar que el pedido pertenece al cliente
+            if (!pedido.getCliente().getCliente_id().equals(cliente.getCliente_id())) {
+                response.put("success", false);
+                response.put("message", "No tienes permiso para ver este pedido");
+                return response;
+            }
+
+            Map<String, Object> pedidoDetalle = new HashMap<>();
+            pedidoDetalle.put("folio", pedido.getFolio());
+            pedidoDetalle.put("fecha", pedido.getFechaPedido().toString());
+            pedidoDetalle.put("estado", pedido.getEstado());
+            pedidoDetalle.put("subtotal", pedido.getSubtotal());
+            pedidoDetalle.put("iva", pedido.getIva());
+            pedidoDetalle.put("total", pedido.getTotal());
+            pedidoDetalle.put("direccion", pedido.getDireccionEntrega());
+            pedidoDetalle.put("notas", pedido.getNotasAdicionales());
+            
+            // Detalles de productos
+            List<Map<String, Object>> productos = pedido.getDetalles().stream().map(d -> {
+                Map<String, Object> prod = new HashMap<>();
+                prod.put("nombre", d.getProducto().getNombre());
+                prod.put("cantidad", d.getCantidad());
+                prod.put("precioUnitario", d.getPrecioUnitario());
+                prod.put("importe", d.getImporte());
+                return prod;
+            }).collect(Collectors.toList());
+            
+            pedidoDetalle.put("productos", productos);
+
+            response.put("success", true);
+            response.put("pedido", pedidoDetalle);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    @PutMapping("/cancelar/{pedidoId}")
+    public Map<String, Object> cancelarPedido(@PathVariable Long pedidoId, Authentication auth) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            String username = auth.getName();
+            clientes cliente = repoClientes.findByUserName(username);
+            
+            Pedidos pedido = repoPedidos.findById(pedidoId).orElse(null);
+            
+            if (pedido == null) {
+                response.put("success", false);
+                response.put("message", "Pedido no encontrado");
+                return response;
+            }
+
+            if (!pedido.getCliente().getCliente_id().equals(cliente.getCliente_id())) {
+                response.put("success", false);
+                response.put("message", "No tienes permiso para cancelar este pedido");
+                return response;
+            }
+
+            if (pedido.getEstado().equals("CANCELADO")) {
+                response.put("success", false);
+                response.put("message", "El pedido ya está cancelado");
+                return response;
+            }
+
+            if (pedido.getEstado().equals("ENTREGADO")) {
+                response.put("success", false);
+                response.put("message", "No se puede cancelar un pedido entregado");
+                return response;
+            }
+
+            pedido.setEstado("CANCELADO");
+            repoPedidos.save(pedido);
+
+            response.put("success", true);
+            response.put("message", "Pedido cancelado exitosamente");
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error: " + e.getMessage());
+        }
         return new HashMap<>(); 
     }
     
-    // (Asegúrate de mantener tu método generarFolio al final)
+   
     private String generarFolio() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
