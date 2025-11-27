@@ -13,7 +13,7 @@ public class ProcesarFacturaRoute extends RouteBuilder {
             .routeId("ProcesoFacturacion")
             
             // Log inicial
-            .log("🧾 CAMEL: Recibida solicitud de facturación -> ${body}")
+            .log("CAMEL: Recibida solicitud de facturación -> ${body}")
             
             // Simulamos generación de PDF y Timbrado SAT
             .process(exchange -> {
