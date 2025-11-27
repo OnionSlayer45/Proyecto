@@ -36,7 +36,7 @@ public class PedidosController {
     @Autowired
     private RepoCarrito repoCarrito;
 
-    // 2. INYECTAR EL DISPARADOR DE CAMEL (NUEVO)
+    //INYECTAR EL DISPARADOR CAMEL (el nuevo)
     @Autowired
     private ProducerTemplate producerTemplate;
 
@@ -88,8 +88,7 @@ public class PedidosController {
             // Guardar pedido
             repoPedidos.save(pedido);
 
-            // 3. ¡AQUÍ DISPARAMOS A CAMEL! (NUEVO)
-            // Usamos el mismo canal "direct:facturacion" que escucha tu ruta ProcesarFacturaRoute
+            //disparar camello
             String mensaje = "Pedido Creado - Folio: " + pedido.getFolio() + " - Cliente: " + username;
             producerTemplate.sendBody("direct:facturacion", mensaje);
 
@@ -112,20 +111,12 @@ public class PedidosController {
         return response;
     }
 
-    // ... (El resto de métodos @GetMapping y @PutMapping se quedan igual, no los borres) ...
-    // Para no hacer el archivo gigante aquí, solo asegúrate de no borrar el resto de tu clase original.
-    
-    // Si copias y pegas todo este archivo, asegúrate de incluir los métodos obtenerHistorial, obtenerDetallePedido, cancelarPedido y generarFolio que ya tenías.
-    // Solo agregué las partes marcadas como (NUEVO).
 
     @GetMapping("/historial")
     public Map<String, Object> obtenerHistorial(Authentication auth) {
-        // ... (Tu código original de historial) ...
-        // Para simplificar, dejo este método resumido, pero tú usa tu código original
         return new HashMap<>(); 
     }
     
-    // (Asegúrate de mantener tu método generarFolio al final)
     private String generarFolio() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
