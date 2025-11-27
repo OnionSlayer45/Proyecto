@@ -73,6 +73,12 @@
 	<scope>test</scope>
 </dependency>
 
+		<!-- dependencias del camell -->
+		<dependency>
+			<groupId>org.apache.camel.springboot</groupId>
+			<artifactId>camel-spring-boot-starter</artifactId>
+			<version>4.4.0</version>
+		</dependency>
 
 	</dependencies>
 
