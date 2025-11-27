@@ -1,4 +1,7 @@
 package com.fing.app.controllers;
+// importamos camel
+
+import org.apache.camel.ProducerTemplate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -29,7 +32,11 @@ public class FacturaController {
 
     @Autowired
     private RepoCarrito repoCarrito;
-
+    
+    //inyectar el producto camel
+    @Autowired
+    private ProducerTemplate producerTemplate;
+    
     @PostMapping("/procesar")
     public Map<String, Object> procesarCompra(Authentication auth) {
         Map<String, Object> response = new HashMap<>();
@@ -77,6 +84,11 @@ public class FacturaController {
 
             // Guardar factura
             repoFacturas.save(factura);
+            
+            // disparar camell
+            // viamos el Folio de la factura al canal "direct:facturacion"
+            String mensajeParaCamel = "Nueva venta realizada. Folio: " + factura.getFolio() + " - Cliente: " + username;
+            producerTemplate.sendBody("direct:facturacion", mensajeParaCamel);           
 
             // Limpiar carrito
             carrito.getListaProductos().clear();
