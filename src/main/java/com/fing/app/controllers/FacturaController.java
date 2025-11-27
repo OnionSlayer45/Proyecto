@@ -86,7 +86,7 @@ public class FacturaController {
             repoFacturas.save(factura);
             
             // disparar camell
-            // viamos el Folio de la factura al canal "direct:facturacion"
+            // viamos el Folio de la factura
             String mensajeParaCamel = "Nueva venta realizada. Folio: " + factura.getFolio() + " - Cliente: " + username;
             producerTemplate.sendBody("direct:facturacion", mensajeParaCamel);           
 
